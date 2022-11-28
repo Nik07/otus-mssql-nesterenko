@@ -1,2 +1,3 @@
-# otus-mssql-nesterenko
-otus MS SQL Course
+Домашние задания курса OTUS "MS SQL Server Developer".
+
+Группа 2022-09.
