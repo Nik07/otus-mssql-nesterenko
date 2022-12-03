@@ -223,3 +223,4 @@ FROM
   INNER JOIN Warehouse.StockItems AS si 
     ON il.StockItemID = si.StockItemID 
       AND si.StockItemName = 'Chocolate frogs 250g'
+;
