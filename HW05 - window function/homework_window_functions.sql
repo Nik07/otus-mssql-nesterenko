@@ -262,30 +262,7 @@ ORDER BY
 	END
 ;
 
-SELECT TOP (1) WITH TIES 
-	Customers.CustomerID,
-	Customers.CustomerName,
-	StockItemID,
-	UnitPrice,
-	Invoices.InvoiceDate
-FROM 
-	Sales.Invoices
-	JOIN Sales.InvoiceLines ON InvoiceLines.InvoiceID = Invoices.InvoiceID
-	JOIN Sales.Customers ON Customers.CustomerID = Invoices.CustomerID
-GROUP BY 
-	Customers.CustomerID,
-	Customers.CustomerName,
-	StockItemID,
-	UnitPrice,
-	Invoices.InvoiceDate
-ORDER BY 
-	CASE
-		WHEN  DENSE_RANK() OVER(PARTITION BY Customers.CustomerID ORDER BY UnitPrice DESC) <= 2 THEN 1
-		ELSE 2
-	END
-;
-
--- вариант 3, наиболее короткий, но здесь лишнее поле
+-- вариант 3, наиболее короткий самый быстрый, но здесь лишнее поле
 SELECT DISTINCT TOP (1) WITH TIES 
 	Customers.CustomerID,
 	Customers.CustomerName,
