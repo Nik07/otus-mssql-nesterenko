@@ -87,27 +87,27 @@ MERGE Warehouse.StockItems AS target
     WHEN NOT MATCHED 
         THEN INSERT (
 		        [StockItemName],
-				[SupplierID],
-				[UnitPackageID],
-				[OuterPackageID],
-				[LeadTimeDays],
-				[QuantityPerOuter],
-				[IsChillerStock],
-				[TaxRate],
-				[UnitPrice],
-				[TypicalWeightPerUnit],
-				[LastEditedBy])
+		        [SupplierID],
+		        [UnitPackageID],
+		        [OuterPackageID],
+		        [LeadTimeDays],
+		        [QuantityPerOuter],
+		        [IsChillerStock],
+		        [TaxRate],
+		        [UnitPrice],
+		        [TypicalWeightPerUnit],
+		        [LastEditedBy])
         VALUES (
 		        source.[StockItemName],
-				source.[SupplierID],
-				source.[UnitPackageID],
-				source.[OuterPackageID],
-				source.[LeadTimeDays],
-				source.[QuantityPerOuter],
-				source.[IsChillerStock],
-				source.[TaxRate],
-				source.[UnitPrice],
-				source.[TypicalWeightPerUnit],1)
+		        source.[SupplierID],
+		        source.[UnitPackageID],
+		        source.[OuterPackageID],
+		        source.[LeadTimeDays],
+		        source.[QuantityPerOuter],
+		        source.[IsChillerStock],
+		        source.[TaxRate],
+		        source.[UnitPrice],
+		        source.[TypicalWeightPerUnit],1)
         OUTPUT deleted.*, $action, inserted.*;
 
 --- чистим память --------------------------------------------------------
