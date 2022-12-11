@@ -47,49 +47,68 @@ EXEC sp_xml_preparedocument @docHandle OUTPUT, @x
 ---- будеи работать с копией ---------------------------------------------
 --------------------------------------------------------------------------
 MERGE Warehouse.StockItems AS target 
-	USING (SELECT *
-			FROM OPENXML(@docHandle, N'/StockItems/Item')
-			WITH ( 
-				[StockItemName] nvarchar(100) '@Name',
-				[SupplierID] int 'SupplierID',
-				[UnitPackageID] int 'Package/UnitPackageID',
-				[OuterPackageID] int 'Package/OuterPackageID',
-				[QuantityPerOuter] int 'Package/QuantityPerOuter',
-				[TypicalWeightPerUnit] decimal(18,3) 'Package/TypicalWeightPerUnit',
-				[LeadTimeDays] int 'LeadTimeDays',
-				[IsChillerStock] bit 'IsChillerStock',
-				[TaxRate] decimal(18,3) 'TaxRate',
-				[UnitPrice] decimal(18,6) 'UnitPrice')
-			) 
-			AS source (
-				StockItemName,
-				SupplierID,
-				UnitPackageID,
-				OuterPackageID,
-				LeadTimeDays,
-				QuantityPerOuter,
-				IsChillerStock,
-				TaxRate,
-				UnitPrice,
-				TypicalWeightPerUnit) 
-			ON (target.StockItemName = source.StockItemName) 
-	WHEN MATCHED 
-		THEN UPDATE SET  
-				[SupplierID]            = source.[SupplierID]
-				,[UnitPackageID]        = source.[UnitPackageID]
-				,[OuterPackageID]       = source.[OuterPackageID]
-				,[QuantityPerOuter]     = source.[QuantityPerOuter]
-				,[TypicalWeightPerUnit] = source.[TypicalWeightPerUnit]
-				,[LeadTimeDays]         = source.[LeadTimeDays]
-				,[IsChillerStock]       = source.[IsChillerStock]
-				,[TaxRate]              = source.[TaxRate]
-				,[UnitPrice]            = source.[UnitPrice]                    
-	WHEN NOT MATCHED 
-		THEN INSERT ([StockItemName],[SupplierID],[UnitPackageID],[OuterPackageID],[LeadTimeDays]
-                ,[QuantityPerOuter],[IsChillerStock],[TaxRate],[UnitPrice],[TypicalWeightPerUnit],[LastEditedBy])
-         VALUES (source.[StockItemName],source.[SupplierID],source.[UnitPackageID],source.[OuterPackageID],source.[LeadTimeDays]
-                ,source.[QuantityPerOuter],source.[IsChillerStock],source.[TaxRate],source.[UnitPrice],source.[TypicalWeightPerUnit],1)
-		OUTPUT deleted.*, $action, inserted.*;
+    USING (SELECT *
+            FROM OPENXML(@docHandle, N'/StockItems/Item')
+            WITH ( 
+                [StockItemName] nvarchar(100) '@Name',
+                [SupplierID] int 'SupplierID',
+                [UnitPackageID] int 'Package/UnitPackageID',
+                [OuterPackageID] int 'Package/OuterPackageID',
+                [QuantityPerOuter] int 'Package/QuantityPerOuter',
+                [TypicalWeightPerUnit] decimal(18,3) 'Package/TypicalWeightPerUnit',
+                [LeadTimeDays] int 'LeadTimeDays',
+                [IsChillerStock] bit 'IsChillerStock',
+                [TaxRate] decimal(18,3) 'TaxRate',
+                [UnitPrice] decimal(18,6) 'UnitPrice')
+            ) 
+            AS source (
+                StockItemName,
+                SupplierID,
+                UnitPackageID,
+                OuterPackageID,
+                LeadTimeDays,
+                QuantityPerOuter,
+                IsChillerStock,
+                TaxRate,
+                UnitPrice,
+                TypicalWeightPerUnit) 
+            ON (target.StockItemName = source.StockItemName) 
+    WHEN MATCHED 
+        THEN UPDATE SET  
+                [SupplierID]            = source.[SupplierID]
+                ,[UnitPackageID]        = source.[UnitPackageID]
+                ,[OuterPackageID]       = source.[OuterPackageID]
+                ,[QuantityPerOuter]     = source.[QuantityPerOuter]
+                ,[TypicalWeightPerUnit] = source.[TypicalWeightPerUnit]
+                ,[LeadTimeDays]         = source.[LeadTimeDays]
+                ,[IsChillerStock]       = source.[IsChillerStock]
+                ,[TaxRate]              = source.[TaxRate]
+                ,[UnitPrice]            = source.[UnitPrice]                    
+    WHEN NOT MATCHED 
+        THEN INSERT (
+		        [StockItemName],
+				[SupplierID],
+				[UnitPackageID],
+				[OuterPackageID],
+				[LeadTimeDays],
+				[QuantityPerOuter],
+				[IsChillerStock],
+				[TaxRate],
+				[UnitPrice],
+				[TypicalWeightPerUnit],
+				[LastEditedBy])
+        VALUES (
+		        source.[StockItemName],
+				source.[SupplierID],
+				source.[UnitPackageID],
+				source.[OuterPackageID],
+				source.[LeadTimeDays],
+				source.[QuantityPerOuter],
+				source.[IsChillerStock],
+				source.[TaxRate],
+				source.[UnitPrice],
+				source.[TypicalWeightPerUnit],1)
+        OUTPUT deleted.*, $action, inserted.*;
 
 --- чистим память --------------------------------------------------------
 EXEC sp_xml_removedocument @docHandle
@@ -102,67 +121,67 @@ SET @x = (SELECT * FROM OPENROWSET (BULK 'C:\1\StockItems.xml', SINGLE_BLOB)  AS
 --------------------------------------------------------------------------
 MERGE Warehouse.StockItems AS target 
 	USING (SELECT  
-			  t.StockItems.value('(@Name)[1]', 'nvarchar(100)') as [StockItemName],   
-			  t.StockItems.value('(SupplierID)[1]', 'int') as [SupplierID], 
-			  t.StockItems.value('(Package/UnitPackageID)[1]', 'int') as [UnitPackageID],
-			  t.StockItems.value('(Package/OuterPackageID)[1]', 'int') as [OuterPackageID],
-			  t.StockItems.value('(Package/QuantityPerOuter)[1]', 'int') as [QuantityPerOuter],
-			  t.StockItems.value('(Package/TypicalWeightPerUnit)[1]', 'decimal(18,3)') as [TypicalWeightPerUnit],
-			  t.StockItems.value('(LeadTimeDays)[1]', 'int') as [LeadTimeDays],
-			  t.StockItems.value('(IsChillerStock)[1]', 'bit') as [IsChillerStock],
-			  t.StockItems.value('(TaxRate)[1]', 'decimal(18,3)') as [TaxRate],
-			  t.StockItems.value('(UnitPrice)[1]', 'decimal(18,6)') as [UnitPrice]
-			FROM @x.nodes('/StockItems/Item') as t(StockItems)  
-			) 
-			AS source (
-				[StockItemName],
-				[SupplierID],
-				[UnitPackageID],
-				[OuterPackageID],
-				[QuantityPerOuter],
-				[TypicalWeightPerUnit],
-				[LeadTimeDays],
-				[IsChillerStock],
-				[TaxRate],
-				[UnitPrice]) 
+                t.StockItems.value('(@Name)[1]', 'nvarchar(100)') as [StockItemName],   
+                t.StockItems.value('(SupplierID)[1]', 'int') as [SupplierID], 
+                t.StockItems.value('(Package/UnitPackageID)[1]', 'int') as [UnitPackageID],
+                t.StockItems.value('(Package/OuterPackageID)[1]', 'int') as [OuterPackageID],
+                t.StockItems.value('(Package/QuantityPerOuter)[1]', 'int') as [QuantityPerOuter],
+                t.StockItems.value('(Package/TypicalWeightPerUnit)[1]', 'decimal(18,3)') as [TypicalWeightPerUnit],
+                t.StockItems.value('(LeadTimeDays)[1]', 'int') as [LeadTimeDays],
+                t.StockItems.value('(IsChillerStock)[1]', 'bit') as [IsChillerStock],
+                t.StockItems.value('(TaxRate)[1]', 'decimal(18,3)') as [TaxRate],
+                 t.StockItems.value('(UnitPrice)[1]', 'decimal(18,6)') as [UnitPrice]
+            FROM @x.nodes('/StockItems/Item') as t(StockItems)
+            )
+            AS source (
+                [StockItemName],
+                [SupplierID],
+                [UnitPackageID],
+                [OuterPackageID],
+                [QuantityPerOuter],
+                [TypicalWeightPerUnit],
+                [LeadTimeDays],
+                [IsChillerStock],
+                [TaxRate],
+                [UnitPrice]) 
 			ON (target.StockItemName = source.StockItemName) 
-	WHEN MATCHED 
-		THEN UPDATE SET  
-				[SupplierID]           = source.[SupplierID],
-				[UnitPackageID]        = source.[UnitPackageID],
-				[OuterPackageID]       = source.[OuterPackageID],
-				[QuantityPerOuter]     = source.[QuantityPerOuter],
-				[TypicalWeightPerUnit] = source.[TypicalWeightPerUnit],
-				[LeadTimeDays]         = source.[LeadTimeDays],
-				[IsChillerStock]       = source.[IsChillerStock],
-				[TaxRate]              = source.[TaxRate],
-				[UnitPrice]            = source.[UnitPrice]                    
-	WHEN NOT MATCHED 
-		THEN INSERT (
-				[StockItemName],
-				[SupplierID],
-				[UnitPackageID],
-				[OuterPackageID],
-				[QuantityPerOuter],
-				[TypicalWeightPerUnit],
-				[LeadTimeDays],				
-				[IsChillerStock],
-				[TaxRate],
-				[UnitPrice],				
-				[LastEditedBy])
+    WHEN MATCHED 
+        THEN UPDATE SET  
+                [SupplierID]           = source.[SupplierID],
+                [UnitPackageID]        = source.[UnitPackageID],
+                [OuterPackageID]       = source.[OuterPackageID],
+                [QuantityPerOuter]     = source.[QuantityPerOuter],
+                [TypicalWeightPerUnit] = source.[TypicalWeightPerUnit],
+                [LeadTimeDays]         = source.[LeadTimeDays],
+                [IsChillerStock]       = source.[IsChillerStock],
+                [TaxRate]              = source.[TaxRate],
+                [UnitPrice]            = source.[UnitPrice]                    
+        WHEN NOT MATCHED 
+        THEN INSERT (
+                [StockItemName],
+                [SupplierID],
+                [UnitPackageID],
+                [OuterPackageID],
+                [QuantityPerOuter],
+                [TypicalWeightPerUnit],
+                [LeadTimeDays],				
+                [IsChillerStock],
+                [TaxRate],
+                [UnitPrice],				
+                [LastEditedBy])
          VALUES (
-				source.[StockItemName],
-				source.[SupplierID],
-				source.[UnitPackageID],
-				source.[OuterPackageID],
-				source.[TypicalWeightPerUnit],
-				source.[QuantityPerOuter],
-				source.[LeadTimeDays],				
-				source.[IsChillerStock],
-				source.[TaxRate],
-				source.[UnitPrice],
-				1)
-		OUTPUT deleted.*, $action, inserted.*;
+                source.[StockItemName],
+                source.[SupplierID],
+                source.[UnitPackageID],
+                source.[OuterPackageID],
+                source.[TypicalWeightPerUnit],
+                source.[QuantityPerOuter],
+                source.[LeadTimeDays],				
+                source.[IsChillerStock],
+                source.[TaxRate],
+                source.[UnitPrice],
+                1)
+        OUTPUT deleted.*, $action, inserted.*;
 
 
 /*
@@ -192,12 +211,12 @@ EXEC master..xp_cmdshell @sqlCmd
 */
 
 SELECT
-	[StockItemID], 
-	[StockItemName],
-	[CountryOfManufacture] = JSON_VALUE(CustomFields, '$.CountryOfManufacture'),
-	[FirstTag] = JSON_VALUE(CustomFields, '$.Tags[1]')
+    [StockItemID], 
+    [StockItemName],
+    [CountryOfManufacture] = JSON_VALUE(CustomFields, '$.CountryOfManufacture'),
+    [FirstTag] = JSON_VALUE(CustomFields, '$.Tags[1]')
 FROM
-	[Warehouse].[StockItems]
+    [Warehouse].[StockItems]
 
 /*
 4. Найти в StockItems строки, где есть тэг "Vintage".
@@ -220,7 +239,7 @@ FROM
 
 SELECT
     s.StockItemID,
-	s.StockItemName,
+    s.StockItemName,
     [Tags] = REPLACE(STUFF(JSON_QUERY(s.CustomFields, '$.Tags'), 1, 1,''), ']','')
 FROM
     Warehouse.StockItems as s
