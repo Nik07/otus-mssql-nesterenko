@@ -110,8 +110,8 @@ WHERE [CustomerName] LIKE 'ZZZ_%'
 
 MERGE [Sales].[Customers] AS target 
 	USING (SELECT TOP (5)
-			[CustomerName] = 'ZZZ_' + CONVERT(NVARCHAR(20), [CustomerID])
-           ,[BillToCustomerID]
+            [CustomerName] = 'ZZZ_' + CONVERT(NVARCHAR(20), [CustomerID])
+            ,[BillToCustomerID]
            ,[CustomerCategoryID]
            ,[BuyingGroupID]
            ,[PrimaryContactPersonID]
@@ -237,8 +237,8 @@ MERGE [Sales].[Customers] AS target
 			   ,source.[PostalAddressLine2]
 			   ,source.[PostalPostalCode]
 			   ,source.[LastEditedBy]
-			) 
-	OUTPUT deleted.*, $action, inserted.*;
+                ) 
+    OUTPUT deleted.*, $action, inserted.*;
 
 /*
 5. Напишите запрос, который выгрузит данные через bcp out и загрузить через bulk insert
@@ -271,16 +271,16 @@ exec master..xp_cmdshell @bcp_comm;
 DELETE FROM [Sales].[Customers_temp];
 
 BULK INSERT [WideWorldImporters].[Sales].[Customers_temp]
-			FROM "C:\1\Cust.txt"
-			WITH 
-				(
-				BATCHSIZE = 1000, 
-				DATAFILETYPE = 'widechar',
-				FIELDTERMINATOR = '@@@',
-				ROWTERMINATOR ='\n',
-				KEEPNULLS,
-				TABLOCK        
-				);
+        FROM "C:\1\Cust.txt"
+        WITH 
+            (
+                BATCHSIZE = 1000, 
+                DATAFILETYPE = 'widechar',
+                FIELDTERMINATOR = '@@@',
+                ROWTERMINATOR ='\n',
+                KEEPNULLS,
+                TABLOCK        
+                );
 
 SELECT COUNT(*) FROM [Sales].[Customers_temp]
 DROP TABLE IF EXISTS [Sales].[Customers_temp]
