@@ -28,7 +28,6 @@ USE WideWorldImporters;
 * Пример экспорта/импорта в файл https://docs.microsoft.com/en-us/sql/relational-databases/import-export/examples-of-bulk-import-and-export-of-xml-documents-sql-server
 */
 
-
 /*
 1. В личном кабинете есть файл StockItems.xml.
 Это данные из таблицы Warehouse.StockItems.
