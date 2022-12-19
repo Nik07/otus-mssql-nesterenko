@@ -1,0 +1,7 @@
+C:\Users\nik62\source\repos\ExcelExport\bin\Release\ExcelExport.dacpac
+C:\Users\nik62\source\repos\ExcelExport\bin\Release\ExcelExport.dll
+C:\Users\nik62\source\repos\ExcelExport\obj\Release\Model.xml
+C:\Users\nik62\source\repos\ExcelExport\obj\Release\refactor.xml
+C:\Users\nik62\source\repos\ExcelExport\obj\Release\postdeploy.sql
+C:\Users\nik62\source\repos\ExcelExport\obj\Release\predeploy.sql
+C:\Users\nik62\source\repos\ExcelExport\obj\Release\ExcelExport.dll
